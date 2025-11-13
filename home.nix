@@ -13,7 +13,7 @@ with builtins;
     go nodejs_24
 
     # shells
-    neovim tmux fzf git ghq
+    neovim tmux fzf git ghq gh
     
     # desktop apps
     vscode
@@ -115,7 +115,7 @@ with builtins;
     };
 
         # setopt / keybindings that were in your .zshrc
-    initExtraBeforeCompInit = ''
+    initContent = lib.mkOrder 550''
       setopt nobeep notify auto_menu auto_pushd auto_cd interactivecomments nonomatch
       setopt hist_no_store hist_expand
       bindkey -v
@@ -123,10 +123,8 @@ with builtins;
       bindkey '^N' history-beginning-search-forward
       # needs the "zaw" plugin below
       bindkey '^h' zaw-history
-    '';
 
-    # Prompt: pure (matches your setup + zstyles)
-    initExtra = ''
+      # Prompt: pure (matches your setup + zstyles)
       fpath+=(${pkgs.pure-prompt}/share/zsh/site-functions)
       autoload -U promptinit; promptinit
       prompt pure
@@ -193,7 +191,7 @@ with builtins;
       # YAML check
       ymlc = ''ruby -ryaml -e "p YAML.load(STDIN.read)" <'';
       # ghq helpers
-      gh = "hub browse $(ghq list -p | grep github.com | peco | cut -d '/' -f 2,3)";
+      ghqb = "hub browse $(ghq list -p | grep github.com | peco | cut -d '/' -f 2,3)";
       g  = "cd $(ghq list -p | fzf)";
     };
   };
