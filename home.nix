@@ -13,7 +13,7 @@ with builtins;
     go nodejs_24
 
     # shells
-    neovim tmux fzf git ghq gh
+    neovim tmux fzf git ghq gh lazygit
     
     # desktop apps
     vscode
@@ -21,8 +21,8 @@ with builtins;
     # background
     tailscale
 
-    #
-    codex
+    #AI tools
+    codex github-copilot-cli
   ];
 
   programs.git = {
@@ -64,6 +64,9 @@ with builtins;
       };
       rerere = {
         enabled = true;
+      };
+      core = {
+        editor = "vim";
       };
     };
     ignores = [
@@ -135,6 +138,10 @@ with builtins;
 
       # completion menu behavior
       zstyle ':completion:*:default' menu select=1
+
+      # npm global package place
+      export PATH="$HOME/.npm-global/bin:$PATH"
+      export PATH="$HOME/.local/bin:$PATH
     '';
 
     loginExtra = ''
@@ -199,20 +206,20 @@ with builtins;
    programs.tmux = {
     enable = true;
 
-    baseIndex = 1;
-    clock24 = true;
-    escapeTime = 1;
+
     extraConfig = ''
       source ${./.tmux.conf}
     '';
+    baseIndex = 1;
+    clock24 = true;
+    escapeTime = 1;
     historyLimit = 5000;
     keyMode = "vi";
     newSession = false;
     prefix = "C-t";
-    shell = pkgs.lib.getExe pkgs.zsh;
     terminal = "screen-256color";
     plugins = with pkgs.tmuxPlugins; [
-      sensible
+      # sensible
       yank
       resurrect
       continuum
