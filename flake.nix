@@ -12,6 +12,9 @@
   outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager }:
 
   let
+    username = builtins.getEnv "USER"; 
+    homedir = builtins.getEnv "HOME";
+    system = "aarch64-darwin"; 
     configuration = { pkgs, ... }: {
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
@@ -35,23 +38,42 @@
 
       # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";
-      home-manager.users."yoshiki" = import ./home.nix;
 
       # to install vscode
       nixpkgs.config.allowUnfree = true;
     };
+
   in
   {
     # Build darwin flake using:
     # $ darwin-rebuild build --flake .#Yoshikis-Mac-mini
     darwinConfigurations."Yoshikis-Mac-mini" = nix-darwin.lib.darwinSystem {
-
       modules =
       [ configuration
         home-manager.darwinModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
+          home-manager.users."yoshiki" = import ./home.nix;
+          home-manager.extraSpecialArgs = {
+            username = "yoshiki";
+            homeDirectory = "/Users/yoshiki";
+          };
+        }
+      ];
+    };
+    darwinConfigurations."Yoshikis-MacBook-Pro" = nix-darwin.lib.darwinSystem {
+      modules =
+      [ configuration
+        home-manager.darwinModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users."yoshikimasubuchi" = import ./home.nix;
+          home-manager.extraSpecialArgs = {
+            username = "yoshikimasubuchi";
+            homeDirectory = "/Users/yoshikimasubuchi";
+          };
         }
       ];
     };

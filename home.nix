@@ -1,8 +1,8 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, username, homeDirectory, ... }:
 with builtins;
 {
-  home.username = "yoshiki";
-  home.homeDirectory = lib.mkForce "/Users/yoshiki";
+  home.username = username;
+  home.homeDirectory = lib.mkForce homeDirectory;
 
   home.stateVersion = "25.05";
 
