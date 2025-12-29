@@ -141,7 +141,7 @@ with builtins;
 
       # npm global package place
       export PATH="$HOME/.npm-global/bin:$PATH"
-      export PATH="$HOME/.local/bin:$PATH
+      export PATH="$HOME/.local/bin:$PATH"
     '';
 
     loginExtra = ''
@@ -205,10 +205,15 @@ with builtins;
 
    programs.tmux = {
     enable = true;
+    # shell = "${pkgs.zsh}/bin/zsh";
 
 
     extraConfig = ''
       source ${./.tmux.conf}
+
+      # the workaround for macOS default shell issue with nix and tmux. https://github.com/nix-community/home-manager/issues/5952#issuecomment-2409056750
+      set -gu default-command
+      set -g default-shell "$SHELL"
     '';
     baseIndex = 1;
     clock24 = true;
