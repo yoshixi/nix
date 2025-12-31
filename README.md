@@ -18,7 +18,7 @@ $ echo "experimental-features = nix-command flakes" > ~/.config/nix/nix.conf
 # Install nix-darwin
 $ sudo mkdir -p /etc/nix-darwin
 $ sudo chown $(id -nu):$(id -ng) /etc/nix-darwin
-$ git clone https://github.com/yoshixi/nix /etc/nix-darwin
+$ git clone git@github.com:yoshixi/nix.git /etc/nix-darwin
 $ cd /etc/nix-darwin
 
 $ sudo nix flake init -t nix-darwin/master
@@ -39,3 +39,12 @@ sudo darwin-rebuild switch
 ## Note
 
 - Need to run `prefix` + `I` to install tmux packages.
+
+## LazyVim
+
+It doesn't include LazyVim configuration. LazyVim should be installed manually.
+
+https://www.lazyvim.org/installation
+
+
+
