@@ -17,9 +17,13 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
+    nikitabobko-tap = {
+      url = "github:nikitabobko/homebrew-tap"; # for AeroSpace
+      flake = false;
+    };
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, nix-homebrew, homebrew-core, homebrew-cask }:
+  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, nix-homebrew, homebrew-core, homebrew-cask, nikitabobko-tap }:
 
   let
     username = builtins.getEnv "USER"; 
@@ -87,6 +91,7 @@
             taps = {
               "homebrew/homebrew-core" = homebrew-core;
               "homebrew/homebrew-cask" = homebrew-cask;
+              "nikitabobko/homebrew-tap" = nikitabobko-tap;
             };
             mutableTaps = false;
           };
