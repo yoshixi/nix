@@ -21,8 +21,6 @@ with builtins;
     # background
     tailscale
 
-    #AI tools
-    codex github-copilot-cli
   ];
 
   programs.git = {
@@ -103,6 +101,9 @@ with builtins;
       extended = true;      # EXTENDED_HISTORY
       ignoreDups = true;    # hist_ignore_dups
       share = true;         # share_history
+      saveNoDups = true;
+      findNoDups = true;
+      ignoreAllDups = true;
     };
 
 
