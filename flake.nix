@@ -65,6 +65,7 @@
     darwinConfigurations."Yoshikis-Mac-mini" = nix-darwin.lib.darwinSystem {
       modules =
       [ configuration
+        ./aerospace.nix
         home-manager.darwinModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
@@ -101,6 +102,7 @@
     darwinConfigurations."Yoshikis-MacBook-Pro" = nix-darwin.lib.darwinSystem {
       modules =
       [ configuration
+        ./aerospace.nix
         home-manager.darwinModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
