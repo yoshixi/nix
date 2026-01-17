@@ -65,9 +65,10 @@
     darwinConfigurations."Yoshikis-Mac-mini" = nix-darwin.lib.darwinSystem {
       modules =
       [ configuration
-        ./aerospace.nix
+        ./darwin.nix
         home-manager.darwinModules.home-manager
         {
+          system.primaryUser = "yoshiki";
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.users."yoshiki" = import ./home.nix;
@@ -102,9 +103,10 @@
     darwinConfigurations."Yoshikis-MacBook-Pro" = nix-darwin.lib.darwinSystem {
       modules =
       [ configuration
-        ./aerospace.nix
+        ./darwin.nix
         home-manager.darwinModules.home-manager
         {
+          system.primaryUser = "yoshikimasubuchi";
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.users."yoshikimasubuchi" = import ./home.nix;

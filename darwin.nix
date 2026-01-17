@@ -1,12 +1,12 @@
 { config, pkgs, lib, ... }:
 {
+  # ===================
+  # AeroSpace - Tiling Window Manager
+  # ===================
   services.aerospace = {
     enable = true;
     settings = {
-      after-login-command = [];
       after-startup-command = [];
-
-      start-at-login = true;
 
       enable-normalization-flatten-containers = true;
       enable-normalization-opposite-orientation-for-nested-containers = true;
@@ -25,7 +25,7 @@
       };
 
       mode.main.binding = {
-        # Window navigation
+        # Window navigation (vim-style)
         alt-h = "focus left";
         alt-j = "focus down";
         alt-k = "focus up";
@@ -83,5 +83,34 @@
         backspace = [ "close-all-windows-but-current" "mode main" ];
       };
     };
+  };
+
+  # ===================
+  # JankyBorders - Window Border Highlighting
+  # ===================
+  services.jankyborders = {
+    enable = true;
+    active_color = "0xffe1e3e4";
+    inactive_color = "0xff494d64";
+    width = 5.0;
+    hidpi = true;
+    style = "round";
+  };
+
+  # ===================
+  # SketchyBar - Custom Menu Bar
+  # ===================
+  services.sketchybar = {
+    enable = true;
+  };
+
+  # ===================
+  # Homebrew Casks - macOS Apps
+  # ===================
+  homebrew = {
+    enable = true;
+    casks = [
+      "alt-tab"
+    ];
   };
 }
