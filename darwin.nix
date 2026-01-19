@@ -111,6 +111,7 @@
     enable = true;
     casks = [
       "alt-tab"
+      "codex"
     ];
   };
 }

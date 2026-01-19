@@ -40,6 +40,9 @@
 
       # Necessary for using flakes on this system.
       nix.settings.experimental-features = "nix-command flakes";
+      nix.settings.trusted-users = [ "root" username ];
+      nix.settings.extra-substituters = [ "https://devenv.cachix.org" ];
+      nix.settings.extra-trusted-public-keys = [ "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=" ];
 
       # Enable alternative shell support in nix-darwin.
       # programs.fish.enable = true;
