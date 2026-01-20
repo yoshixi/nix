@@ -20,9 +20,16 @@
       on-focused-monitor-changed = [ "move-mouse monitor-lazy-center" ];
 
       gaps = {
-        inner = { horizontal = 10; vertical = 10; };
-        outer = { left = 10; bottom = 10; top = 10; right = 10; };
+        inner = { horizontal = 5; vertical = 5; };
+        outer = { left = 5; bottom = 5; top = 5; right = 5; };
       };
+
+      on-window-detected = [
+        { "if".app-id = "com.apple.systempreferences"; run = "layout floating"; }
+        { "if".app-id = "com.1password.1password"; run = "layout floating"; }
+        { "if".app-name-regex-substring = "Meet"; run = "layout floating"; }
+        { "if".app-id = "com.spotify.client"; run = "layout floating"; }
+      ];
 
       mode.main.binding = {
         # Window navigation (vim-style)
@@ -64,13 +71,13 @@
         alt-comma = "layout accordion horizontal vertical";
         alt-f = "fullscreen";
 
-        # Split commands
-        alt-minus = "split horizontal";
-        alt-equal = "split vertical";
+        # Join commands (use join-with instead of split when normalizations are enabled)
+        alt-minus = "resize smart -50";
+        alt-equal = "resize smart +50";
 
         # Resize
-        alt-shift-minus = "resize smart -50";
-        alt-shift-equal = "resize smart +50";
+        alt-shift-minus = "resize smart -100";
+        alt-shift-equal = "resize smart +100";
 
         # Service mode
         alt-shift-semicolon = "mode service";
@@ -81,6 +88,22 @@
         r = [ "flatten-workspace-tree" "mode main" ];
         f = [ "layout floating tiling" "mode main" ];
         backspace = [ "close-all-windows-but-current" "mode main" ];
+        alt-shift-h = "join-with left";
+        alt-shift-j = "join-with down";
+        alt-shift-k = "join-with up";
+        alt-shift-l = "join-with right";
+      };
+
+      workspace-to-monitor-force-assignment = {
+        "1" = [ "secondary" "main" ];
+        "2" = [ "secondary" "main" ];
+        "3" = [ "secondary" "main" ];
+        "4" = [ "secondary" "main" ];
+        "5" = [ "secondary" "main" ];
+        "6" = [ "main" "secondary" ];
+        "7" = [ "main" "secondary" ];
+        "8" = [ "main" "secondary" ];
+        "9" = [ "main" "secondary" ];
       };
     };
   };
