@@ -29,6 +29,7 @@
         { "if".app-id = "com.1password.1password"; run = "layout floating"; }
         { "if".app-name-regex-substring = "Meet"; run = "layout floating"; }
         { "if".app-id = "com.spotify.client"; run = "layout floating"; }
+        { "if".app-id = "com.github.Electron"; run = "layout floating"; }
       ];
 
       mode.main.binding = {
