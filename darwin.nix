@@ -1,4 +1,55 @@
 { config, pkgs, lib, ... }:
+let
+  aerospace-grid = pkgs.writeShellScriptBin "aerospace-grid" ''
+    # Arrange windows in current workspace into a grid layout
+    workspace=$(aerospace list-workspaces --focused)
+
+    # Get window count
+    count=$(aerospace list-windows --workspace "$workspace" | wc -l | tr -d ' ')
+
+    if [ "$count" -lt 2 ]; then
+      exit 0
+    fi
+
+    # Flatten and set horizontal layout
+    aerospace flatten-workspace-tree --workspace "$workspace"
+    sleep 0.2
+    aerospace layout tiles horizontal
+    sleep 0.2
+
+    # Calculate rows per column: ceil(sqrt(count))
+    rows=$(awk "BEGIN {r=int(sqrt($count)+0.99); if(r<2) r=2; print r}")
+    cols=$(( (count + rows - 1) / rows ))
+
+    # Use spatial navigation instead of window IDs
+    # Start from leftmost window (focus left until we can't anymore)
+    for ((j = 0; j < count; j++)); do
+      aerospace focus left 2>/dev/null || true
+    done
+    sleep 0.1
+
+    # Track position in grid
+    pos=0
+
+    for ((i = 1; i < count; i++)); do
+      # Move focus to next window on the right
+      aerospace focus right 2>/dev/null || true
+      sleep 0.1
+
+      pos=$((pos + 1))
+
+      # If this is not the first window in a column, join with left
+      if (( pos % rows != 0 )); then
+        aerospace join-with left 2>/dev/null || true
+        sleep 0.1
+      fi
+    done
+
+    # Balance sizes
+    sleep 0.2
+    aerospace balance-sizes
+  '';
+in
 {
   # ===================
   # AeroSpace - Tiling Window Manager
@@ -8,10 +59,10 @@
     settings = {
       after-startup-command = [];
 
-      enable-normalization-flatten-containers = true;
+      enable-normalization-flatten-containers = false;
       enable-normalization-opposite-orientation-for-nested-containers = true;
 
-      accordion-padding = 30;
+      accordion-padding = 10;
       default-root-container-layout = "tiles";
       default-root-container-orientation = "auto";
 
@@ -25,11 +76,24 @@
       };
 
       on-window-detected = [
+        # Floating apps
         { "if".app-id = "com.apple.systempreferences"; run = "layout floating"; }
         { "if".app-id = "com.1password.1password"; run = "layout floating"; }
-        { "if".app-name-regex-substring = "Meet"; run = "layout floating"; }
         { "if".app-id = "com.spotify.client"; run = "layout floating"; }
         { "if".app-id = "com.github.Electron"; run = "layout floating"; }
+        { "if".app-id = "com.electron.aqua-voice"; run = "layout floating"; }
+        { "if".app-id = "com.shuchu.app"; run = "layout floating"; }
+        # Workspace 2: Tiles - Ghostty terminal
+        { "if".app-id = "com.mitchellh.ghostty"; run = [ "move-node-to-workspace 2" "layout tiling" ]; }
+
+        # Workspace 3: Tiles - Slack
+        { "if".app-id = "com.tinyspeck.slackmacgap"; run = [ "move-node-to-workspace 3" "layout tiling" ]; }
+
+        # Workspace 5: Google Meet (Chrome with Meet in title) - Accordion
+        { "if".app-id = "com.google.Chrome"; "if".window-title-regex-substring = "Meet"; check-further-callbacks = false; run = [ "move-node-to-workspace 5" "layout accordion horizontal" ]; }
+
+        # Workspace 5: Chrome on workspace 5 should be floating
+        { "if".app-id = "com.google.Chrome"; "if".workspace = "5"; check-further-callbacks = false; run = "layout floating"; }
       ];
 
       mode.main.binding = {
@@ -82,6 +146,9 @@
 
         # Service mode
         alt-shift-semicolon = "mode service";
+
+        # Grid layout for current workspace
+        alt-shift-g = "exec-and-forget ${aerospace-grid}/bin/aerospace-grid";
       };
 
       mode.service.binding = {
@@ -138,4 +205,11 @@
       "codex"
     ];
   };
+
+  # ===================
+  # System Packages
+  # ===================
+  environment.systemPackages = [
+    aerospace-grid
+  ];
 }
