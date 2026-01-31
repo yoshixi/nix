@@ -88,12 +88,9 @@ in
 
         # Workspace 3: Tiles - Slack
         { "if".app-id = "com.tinyspeck.slackmacgap"; run = [ "move-node-to-workspace 3" "layout tiling" ]; }
-
-        # Workspace 5: Google Meet (Chrome with Meet in title) - Accordion
-        { "if".app-id = "com.google.Chrome"; "if".window-title-regex-substring = "Meet"; check-further-callbacks = false; run = [ "move-node-to-workspace 5" "layout accordion horizontal" ]; }
-
-        # Workspace 5: Chrome on workspace 5 should be floating
-        { "if".app-id = "com.google.Chrome"; "if".workspace = "5"; check-further-callbacks = false; run = "layout floating"; }
+        
+        # Move chrome to workspace 1 as default and go to the workspace1
+        { "if".app-id = "com.google.Chrome"; run = [ "move-node-to-workspace 1" "layout tiling" "workspace 1" ]; }
       ];
 
       mode.main.binding = {
@@ -102,6 +99,7 @@ in
         alt-j = "focus down";
         alt-k = "focus up";
         alt-l = "focus right";
+        alt-t = [ "layout tiles horizontal vertical"];
 
         # Move windows
         alt-shift-h = "move left";
@@ -148,13 +146,13 @@ in
         alt-shift-semicolon = "mode service";
 
         # Grid layout for current workspace
-        alt-shift-g = "exec-and-forget ${aerospace-grid}/bin/aerospace-grid";
       };
 
       mode.service.binding = {
         esc = [ "reload-config" "mode main" ];
         r = [ "flatten-workspace-tree" "mode main" ];
         f = [ "layout floating tiling" "mode main" ];
+        g = "exec-and-forget /run/current-system/sw/bin/aerospace-grid";
         backspace = [ "close-all-windows-but-current" "mode main" ];
         alt-shift-h = "join-with left";
         alt-shift-j = "join-with down";
@@ -168,8 +166,8 @@ in
         "3" = [ "secondary" "main" ];
         "4" = [ "secondary" "main" ];
         "5" = [ "secondary" "main" ];
-        "6" = [ "main" "secondary" ];
-        "7" = [ "main" "secondary" ];
+        "6" = [ "secondary" "main" ];
+        "7" = [ "secondary" "main" ];
         "8" = [ "main" "secondary" ];
         "9" = [ "main" "secondary" ];
       };

@@ -11,6 +11,8 @@ with builtins;
   home.packages = with pkgs; [
     # runtime
     go nodejs_24
+    python3
+    python3Packages.pypdf2
 
     # shells
     neovim tmux fzf git ghq gh lazygit
