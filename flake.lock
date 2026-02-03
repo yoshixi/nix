@@ -148,7 +148,24 @@
         "nikitabobko-tap": "nikitabobko-tap",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "steipete-tap": "steipete-tap"
+      }
+    },
+    "steipete-tap": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1769231452,
+        "narHash": "sha256-poZBKyP7QKWHaHSEsx/H4vq5EpIHriZuWCn+iDNjC7A=",
+        "owner": "steipete",
+        "repo": "homebrew-tap",
+        "rev": "dd242a67aa9f1e6e2f714ba450c2868f4721eb91",
+        "type": "github"
+      },
+      "original": {
+        "owner": "steipete",
+        "repo": "homebrew-tap",
+        "type": "github"
       }
     }
   },

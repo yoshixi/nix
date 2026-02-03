@@ -194,10 +194,14 @@ in
   };
 
   # ===================
-  # Homebrew Casks - macOS Apps
+  # Homebrew - Taps, Brews, and Casks
   # ===================
   homebrew = {
     enable = true;
+    brews = [
+      "reattach-to-user-namespace"
+      "steipete/tap/gogcli"
+    ];
     casks = [
       "alt-tab"
       "codex"

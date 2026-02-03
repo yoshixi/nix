@@ -21,9 +21,13 @@
       url = "github:nikitabobko/homebrew-tap"; # for AeroSpace
       flake = false;
     };
+    steipete-tap = {
+      url = "github:steipete/homebrew-tap"; # for gogcli
+      flake = false;
+    };
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, nix-homebrew, homebrew-core, homebrew-cask, nikitabobko-tap }:
+  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, nix-homebrew, homebrew-core, homebrew-cask, nikitabobko-tap, steipete-tap }:
 
   let
     username = builtins.getEnv "USER"; 
@@ -97,6 +101,7 @@
               "homebrew/homebrew-core" = homebrew-core;
               "homebrew/homebrew-cask" = homebrew-cask;
               "nikitabobko/homebrew-tap" = nikitabobko-tap;
+              "steipete/homebrew-tap" = steipete-tap;
             };
             mutableTaps = false;
           };
