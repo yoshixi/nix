@@ -201,6 +201,8 @@ in
     brews = [
       "reattach-to-user-namespace"
       "steipete/tap/gogcli"
+      "awscli-local"
+      "copilot"
     ];
     casks = [
       "alt-tab"

@@ -13,9 +13,10 @@ with builtins;
     go nodejs_24
     python3
     python3Packages.pypdf2
+    docker
 
     # shells
-    neovim tmux fzf git ghq gh lazygit
+    tmux fzf git ghq gh lazygit lazydocker
     
     # desktop apps
     vscode
@@ -157,7 +158,6 @@ with builtins;
 
     shellAliases = {
       # general
-      vim = "nvim";
       chrome = "open -a 'Google Chrome'";
       sshadd = "ssh-add ~/.ssh/id_rsa";
       ll = "ls -l";
@@ -210,7 +210,27 @@ with builtins;
     };
   };
 
-   programs.tmux = {
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+  };
+
+  # Manage nvim lua config files from this repo.
+  # lazy.nvim still handles plugin downloads at runtime.
+  # lazy-lock.json and lazyvim.json are intentionally NOT managed here
+  # (they are auto-updated by LazyVim).
+  home.file = {
+    ".config/nvim/init.lua".source                      = ./nvim/init.lua;
+    ".config/nvim/lua/config/lazy.lua".source           = ./nvim/lua/config/lazy.lua;
+    ".config/nvim/lua/config/keymaps.lua".source        = ./nvim/lua/config/keymaps.lua;
+    ".config/nvim/lua/config/options.lua".source        = ./nvim/lua/config/options.lua;
+    ".config/nvim/lua/config/autocmds.lua".source       = ./nvim/lua/config/autocmds.lua;
+    ".config/nvim/lua/plugins/neotree.lua".source       = ./nvim/lua/plugins/neotree.lua;
+  };
+
+  programs.tmux = {
     enable = true;
     # shell = "${pkgs.zsh}/bin/zsh";
 
