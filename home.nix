@@ -24,6 +24,8 @@ with builtins;
     # background
     tailscale
 
+    # SQL client
+    usql
   ];
 
   programs.git = {
