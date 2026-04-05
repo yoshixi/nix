@@ -19,7 +19,7 @@ with builtins;
     tmux fzf git ghq gh lazygit lazydocker
     
     # desktop apps
-    vscode
+    google-cloud-sdk
     
     # background
     tailscale
@@ -160,6 +160,10 @@ with builtins;
 
     shellAliases = {
       # general
+      # macOS kills the nix-wrapped `code` binary (Killed: 9) because the Electron
+      # executable is unsigned when installed via nix. Use the signed CLI from the
+      # app bundle directly to bypass the nix wrapper.
+      code   = "'/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code'";
       chrome = "open -a 'Google Chrome'";
       sshadd = "ssh-add ~/.ssh/id_rsa";
       ll = "ls -l";
@@ -230,6 +234,7 @@ with builtins;
     ".config/nvim/lua/config/options.lua".source        = ./nvim/lua/config/options.lua;
     ".config/nvim/lua/config/autocmds.lua".source       = ./nvim/lua/config/autocmds.lua;
     ".config/nvim/lua/plugins/neotree.lua".source       = ./nvim/lua/plugins/neotree.lua;
+    ".config/nvim/lua/plugins/curl-runner.lua".source   = ./nvim/lua/plugins/curl-runner.lua;
   };
 
   programs.tmux = {

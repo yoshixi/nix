@@ -200,9 +200,9 @@ in
     enable = true;
     brews = [
       "reattach-to-user-namespace"
-      "steipete/tap/gogcli"
       "awscli-local"
       "copilot"
+      "googleworkspace-cli"
     ];
     casks = [
       "alt-tab"
