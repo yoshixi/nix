@@ -17,10 +17,11 @@ with builtins;
 
     # shells
     tmux fzf git ghq gh lazygit lazydocker
-    
+
     # desktop apps
     google-cloud-sdk
-    
+    (callPackage ./pkgs/googleworkspace-cli.nix {})
+
     # background
     tailscale
 

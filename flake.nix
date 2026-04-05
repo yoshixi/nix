@@ -78,6 +78,7 @@
           system.primaryUser = "yoshiki";
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
+          home-manager.backupFileExtension = "hm-backup";
           home-manager.users."yoshiki" = import ./home.nix;
           home-manager.extraSpecialArgs = {
             username = "yoshiki";

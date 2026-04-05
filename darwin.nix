@@ -202,7 +202,6 @@ in
       "reattach-to-user-namespace"
       "awscli-local"
       "copilot"
-      "googleworkspace-cli"
     ];
     casks = [
       "alt-tab"
