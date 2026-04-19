@@ -201,9 +201,10 @@ in
     brews = [
       "reattach-to-user-namespace"
       "awscli-local"
-      "copilot"
+      "googleworkspace-cli"
     ];
     casks = [
+      "copilot-cli"
       "alt-tab"
       "codex"
     ];
