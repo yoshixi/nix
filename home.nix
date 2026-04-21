@@ -12,7 +12,6 @@ with builtins;
     # runtime
     go nodejs_24
     python3
-    python3Packages.pypdf2
     docker
 
     # shells
@@ -222,6 +221,9 @@ with builtins;
     defaultEditor = true;
     viAlias = true;
     vimAlias = true;
+    withRuby = false;
+    withPython3 = false;
+    initLua = builtins.readFile ./nvim/init.lua;
   };
 
   # Manage nvim lua config files from this repo.
@@ -229,7 +231,6 @@ with builtins;
   # lazy-lock.json and lazyvim.json are intentionally NOT managed here
   # (they are auto-updated by LazyVim).
   home.file = {
-    ".config/nvim/init.lua".source                      = ./nvim/init.lua;
     ".config/nvim/lua/config/lazy.lua".source           = ./nvim/lua/config/lazy.lua;
     ".config/nvim/lua/config/keymaps.lua".source        = ./nvim/lua/config/keymaps.lua;
     ".config/nvim/lua/config/options.lua".source        = ./nvim/lua/config/options.lua;
