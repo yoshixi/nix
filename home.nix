@@ -237,6 +237,7 @@ with builtins;
     ".config/nvim/lua/config/autocmds.lua".source       = ./nvim/lua/config/autocmds.lua;
     ".config/nvim/lua/plugins/neotree.lua".source       = ./nvim/lua/plugins/neotree.lua;
     ".config/nvim/lua/plugins/curl-runner.lua".source   = ./nvim/lua/plugins/curl-runner.lua;
+    ".config/nvim/lua/plugins/copilot.lua".source       = ./nvim/lua/plugins/copilot.lua;
   };
 
   programs.tmux = {
