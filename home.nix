@@ -26,6 +26,13 @@ with builtins;
 
     # SQL client
     usql
+
+    # 1Password CLI
+    _1password-cli
+
+    process-compose
+    
+    cloudflared
   ];
 
   programs.git = {
@@ -268,4 +275,5 @@ with builtins;
       # add others from pkgs.tmuxPlugins
     ];
   };
+
 }
