@@ -20,6 +20,7 @@ with builtins;
     # desktop apps
     google-cloud-sdk
     (callPackage ./pkgs/googleworkspace-cli.nix {})
+    (callPackage ./pkgs/worktree.nix {})
 
     # background
     tailscale
@@ -258,6 +259,9 @@ with builtins;
       # the workaround for macOS default shell issue with nix and tmux. https://github.com/nix-community/home-manager/issues/5952#issuecomment-2409056750
       set -gu default-command
       set -g default-shell "$SHELL"
+
+      unbind-key -T prefix C-r
+      set -g command-alias[0] restore='run-shell "${pkgs.tmuxPlugins.resurrect}/share/tmux-plugins/resurrect/scripts/restore.sh"'
     '';
     baseIndex = 1;
     clock24 = true;
