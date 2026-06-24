@@ -20,7 +20,6 @@ with builtins;
     # desktop apps
     google-cloud-sdk
     (callPackage ./pkgs/googleworkspace-cli.nix {})
-    (callPackage ./pkgs/worktree.nix {})
 
     # background
     tailscale
@@ -160,6 +159,8 @@ with builtins;
       # npm global package place
       export PATH="$HOME/.npm-global/bin:$PATH"
       export PATH="$HOME/.local/bin:$PATH"
+
+      . ${./pkgs/worktree.zsh}
     '';
 
     loginExtra = ''
