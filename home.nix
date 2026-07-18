@@ -169,6 +169,8 @@ with builtins;
 
       . ${./pkgs/worktree.zsh}
       . ${./zsh/secureinput.zsh}
+      # Allows running adb from anywhere; requires Android Studio to be installed
+      export PATH="$PATH:$HOME/Library/Android/sdk/platform-tools"
     '';
 
     loginExtra = ''
