@@ -3,7 +3,7 @@ _worktree_dir=".worktree"
 _worktree_usage() {
   echo "Usage: worktree <command> [args]"
   echo "Commands:"
-  echo "  create <branch>  Create worktree and tmux session for branch"
+  echo "  create <branch>  Create worktree and herdr workspace for branch"
   echo "  ls               List all worktrees"
   echo "  cd               Fuzzy-pick a worktree and cd into it"
   echo "  delete           Fuzzy-pick a worktree and remove it"
@@ -26,15 +26,20 @@ _worktree_create() {
 
   local abs_path="$(pwd)/$worktree_path"
   local repo_name="$(basename "$(git rev-parse --show-toplevel)")"
-  local session_name="${repo_name}-${dir_name}"
+  local ws_label="${repo_name}-${dir_name}"
 
-  if tmux has-session -t "$session_name" 2>/dev/null; then
-    echo "Attaching to existing tmux session '$session_name'"
-    tmux switch-client -t "$session_name" 2>/dev/null || tmux attach-session -t "$session_name"
+  # Create (or focus, if it already exists) a herdr workspace for this worktree.
+  local ws_id
+  ws_id=$(herdr workspace list 2>/dev/null | \
+    jq -r --arg l "$ws_label" \
+      'first(.result.workspaces[] | select(.label == $l) | .workspace_id) // empty')
+
+  if [[ -n "$ws_id" ]]; then
+    echo "Focusing existing herdr workspace '$ws_label' ($ws_id)"
+    herdr workspace focus "$ws_id" >/dev/null
   else
-    tmux new-session -d -s "$session_name" -c "$abs_path"
-    echo "Tmux session '$session_name' created"
-    tmux switch-client -t "$session_name" 2>/dev/null || tmux attach-session -t "$session_name"
+    echo "Creating herdr workspace '$ws_label'"
+    herdr workspace create --label "$ws_label" --cwd "$abs_path" --focus >/dev/null
   fi
 }
 

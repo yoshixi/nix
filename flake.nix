@@ -7,6 +7,8 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    herdr.url = "github:ogulcancelik/herdr";
+    herdr.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     # Optional: Declarative tap management
     homebrew-core = {
@@ -18,7 +20,10 @@
       flake = false;
     };
     nikitabobko-tap = {
-      url = "github:nikitabobko/homebrew-tap"; # for AeroSpace
+      # for AeroSpace. Homebrew 6.x defaults HOMEBREW_REQUIRE_TAP_TRUST on, so
+      # this third-party cask must be trusted once per machine (not captured by
+      # the flake): `brew trust --cask nikitabobko/tap/aerospace`
+      url = "github:nikitabobko/homebrew-tap";
       flake = false;
     };
     steipete-tap = {
@@ -27,7 +32,7 @@
     };
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, nix-homebrew, homebrew-core, homebrew-cask, nikitabobko-tap, steipete-tap }:
+  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, herdr, nix-homebrew, homebrew-core, homebrew-cask, nikitabobko-tap, steipete-tap }:
 
   let
     username = builtins.getEnv "USER"; 
@@ -63,6 +68,9 @@
 
       # to install vscode
       nixpkgs.config.allowUnfree = true;
+
+      # herdr — agent multiplexer (https://herdr.dev). Overlay exposes pkgs.herdr.
+      nixpkgs.overlays = [ herdr.overlays.default ];
     };
 
   in

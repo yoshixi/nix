@@ -31,8 +31,11 @@ with builtins;
     _1password-cli
 
     process-compose
-    
+
     cloudflared
+
+    # agent multiplexer (https://herdr.dev), via herdr flake overlay
+    herdr
   ];
 
   programs.git = {
@@ -160,7 +163,12 @@ with builtins;
       export PATH="$HOME/.npm-global/bin:$PATH"
       export PATH="$HOME/.local/bin:$PATH"
 
+      # go install destination ($GOPATH/bin) - appended so the nix-managed
+      # `go` toolchain always wins over anything in here.
+      export PATH="$PATH:$HOME/go/bin"
+
       . ${./pkgs/worktree.zsh}
+      . ${./zsh/secureinput.zsh}
     '';
 
     loginExtra = ''
@@ -207,6 +215,8 @@ with builtins;
       dkilla = "docker kill $(docker ps -q)";
       # tmux wrappers
       t      = "tmux";
+      # herdr wrapper
+      h      = "herdr";
 
       # ruby helpers
       be   = "bundle exec";
@@ -240,6 +250,170 @@ with builtins;
   # lazy-lock.json and lazyvim.json are intentionally NOT managed here
   # (they are auto-updated by LazyVim).
   home.file = {
+    # herdr — use the default ctrl+b prefix
+    ".config/herdr/config.toml".source =
+      (pkgs.formats.toml { }).generate "herdr-config.toml" {
+        onboarding = false;
+        keys.prefix = "ctrl+b";
+        # Workspace navigation: enter workspace mode with prefix+w, then step
+        # through workspaces with bare n/p (no prefix) — n=next(down),
+        # p=previous(up). These are navigate-mode local keys, active only
+        # while that mode is open. Enter switches, esc closes.
+        # (switch_workspace = prefix+shift+1..9 also jumps by number.)
+        keys.navigate_workspace_down = "n";
+        keys.navigate_workspace_up = "p";
+        # Swap the focused pane with its neighbor (mirrors focus_pane h/j/k/l,
+        # with shift). No herdr default — unbound out of the box.
+        keys.swap_pane_left = "prefix+shift+h";
+        keys.swap_pane_down = "prefix+shift+j";
+        keys.swap_pane_up = "prefix+shift+k";
+        keys.swap_pane_right = "prefix+shift+l";
+        # Split the focused pane horizontally on prefix+s (default is
+        # prefix+minus). Moves settings off prefix+s onto prefix+shift+s.
+        keys.split_horizontal = "prefix+s";
+        keys.settings = "prefix+shift+s";
+        # Close tab on prefix+shift+x (herdr default); close the whole workspace
+        # on prefix+shift+q (default is prefix+shift+d). In workspace mode via
+        # prefix+w, bare shift+x closes the tab and shift+q closes the workspace.
+        keys.close_tab = "prefix+shift+x";
+        keys.close_workspace = "prefix+shift+q";
+        # Restore recent pane scrollback across a full server restart / logout.
+        # Off by default because saved output can contain secrets/tokens.
+        experimental.pane_history = true;
+      };
+
+    # AeroSpace tiling WM config. Installed as a Homebrew cask (see darwin.nix)
+    # for a stable app path so Accessibility / Input Monitoring grants survive
+    # updates. `start-at-login = true` makes the app register its own login
+    # item (replacing the old nix-darwin launchd agent).
+    ".aerospace.toml".source =
+      (pkgs.formats.toml { }).generate "aerospace.toml" {
+        start-at-login = true;
+
+        after-startup-command = [];
+
+        enable-normalization-flatten-containers = false;
+        enable-normalization-opposite-orientation-for-nested-containers = true;
+
+        accordion-padding = 10;
+        default-root-container-layout = "tiles";
+        default-root-container-orientation = "auto";
+
+        key-mapping.preset = "qwerty";
+
+        on-focused-monitor-changed = [ "move-mouse monitor-lazy-center" ];
+
+        gaps = {
+          inner = { horizontal = 5; vertical = 5; };
+          outer = { left = 5; bottom = 5; top = 5; right = 5; };
+        };
+
+        on-window-detected = [
+          # Floating apps
+          { "if".app-id = "com.apple.systempreferences"; run = "layout floating"; }
+          { "if".app-id = "com.1password.1password"; run = "layout floating"; }
+          { "if".app-id = "com.spotify.client"; run = "layout floating"; }
+          { "if".app-id = "com.github.Electron"; run = "layout floating"; }
+          { "if".app-id = "com.electron.aqua-voice"; run = "layout floating"; }
+          { "if".app-id = "com.shuchu.app"; run = "layout floating"; }
+          # Workspace 2: Tiles - Ghostty terminal
+          { "if".app-id = "com.mitchellh.ghostty"; run = [ "move-node-to-workspace 2" "layout tiling" ]; }
+
+          # Workspace 3: Tiles - Slack
+          { "if".app-id = "com.tinyspeck.slackmacgap"; run = [ "move-node-to-workspace 3" "layout tiling" ]; }
+
+          # Move chrome to workspace 1 as default and go to the workspace1
+          { "if".app-id = "com.google.Chrome"; run = [ "move-node-to-workspace 1" "layout tiling" "workspace 1" ]; }
+        ];
+
+        mode.main.binding = {
+          # Window navigation (vim-style)
+          alt-h = "focus left";
+          alt-j = "focus down";
+          alt-k = "focus up";
+          alt-l = "focus right";
+          alt-t = [ "layout tiles horizontal vertical"];
+
+          # Move windows
+          alt-shift-h = "move left";
+          alt-shift-j = "move down";
+          alt-shift-k = "move up";
+          alt-shift-l = "move right";
+
+          # Workspace navigation
+          alt-1 = "workspace 1";
+          alt-2 = "workspace 2";
+          alt-3 = "workspace 3";
+          alt-4 = "workspace 4";
+          alt-5 = "workspace 5";
+          alt-6 = "workspace 6";
+          alt-7 = "workspace 7";
+          alt-8 = "workspace 8";
+          alt-9 = "workspace 9";
+
+          # Move window to workspace
+          alt-shift-1 = "move-node-to-workspace 1";
+          alt-shift-2 = "move-node-to-workspace 2";
+          alt-shift-3 = "move-node-to-workspace 3";
+          alt-shift-4 = "move-node-to-workspace 4";
+          alt-shift-5 = "move-node-to-workspace 5";
+          alt-shift-6 = "move-node-to-workspace 6";
+          alt-shift-7 = "move-node-to-workspace 7";
+          alt-shift-8 = "move-node-to-workspace 8";
+          alt-shift-9 = "move-node-to-workspace 9";
+
+          # Layout commands
+          alt-slash = "layout tiles horizontal vertical";
+          alt-comma = "layout accordion horizontal vertical";
+          alt-f = "fullscreen";
+
+          # Join commands (use join-with instead of split when normalizations are enabled)
+          alt-minus = "resize smart -50";
+          alt-equal = "resize smart +50";
+
+          # Resize
+          alt-shift-minus = "resize smart -100";
+          alt-shift-equal = "resize smart +100";
+
+          # Service mode
+          alt-shift-semicolon = "mode service";
+
+          # Grid layout for current workspace
+        };
+
+        mode.service.binding = {
+          esc = [ "reload-config" "mode main" ];
+          r = [ "flatten-workspace-tree" "mode main" ];
+          f = [ "layout floating tiling" "mode main" ];
+          g = "exec-and-forget /run/current-system/sw/bin/aerospace-grid";
+          backspace = [ "close-all-windows-but-current" "mode main" ];
+          alt-shift-h = "join-with left";
+          alt-shift-j = "join-with down";
+          alt-shift-k = "join-with up";
+          alt-shift-l = "join-with right";
+        };
+
+        workspace-to-monitor-force-assignment = {
+          "1" = [ "secondary" "main" ];
+          "2" = [ "secondary" "main" ];
+          "3" = [ "secondary" "main" ];
+          "4" = [ "secondary" "main" ];
+          "5" = [ "secondary" "main" ];
+          "6" = [ "secondary" "main" ];
+          "7" = [ "secondary" "main" ];
+          "8" = [ "main" "secondary" ];
+          "9" = [ "main" "secondary" ];
+        };
+      };
+
+    # Ghostty terminal. Disable auto-secure-input: Ghostty's heuristic turns on
+    # macOS Secure Input when it thinks a password is being typed (e.g. sudo),
+    # which holds a system-wide keyboard lock that blocks AeroSpace's global
+    # hotkeys. See https://ghostty.org/docs/config/reference#macos-auto-secure-input
+    ".config/ghostty/config".text = ''
+      macos-auto-secure-input = false
+    '';
+
     ".config/nvim/lua/config/lazy.lua".source           = ./nvim/lua/config/lazy.lua;
     ".config/nvim/lua/config/keymaps.lua".source        = ./nvim/lua/config/keymaps.lua;
     ".config/nvim/lua/config/options.lua".source        = ./nvim/lua/config/options.lua;
