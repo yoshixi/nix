@@ -1,6 +1,11 @@
 { config, pkgs, lib, username, homeDirectory, ... }:
 with builtins;
 {
+  imports = [
+    # AI agent context (~/.claude/CLAUDE.md, ~/.cursor/rules) generated from ai/
+    ./ai.nix
+  ];
+
   home.username = username;
   home.homeDirectory = lib.mkForce homeDirectory;
 
@@ -16,6 +21,9 @@ with builtins;
 
     # shells
     tmux fzf git ghq gh lazygit lazydocker
+
+    # log viewer (https://lnav.org)
+    lnav
 
     # desktop apps
     google-cloud-sdk
@@ -213,6 +221,8 @@ with builtins;
       # dotfiles/nvim shortcuts (adjust paths if you want)
       vz   = "nvim ${config.home.homeDirectory}/.config/nvim/init.lua";
       vv   = "nvim ${config.home.homeDirectory}/.config/nvim";
+      # shared AI agent context (see ai.nix) — read-only in $HOME, edit here
+      va   = "nvim /etc/nix-darwin/ai/AGENTS.md";
       # docker
       dkilla = "docker kill $(docker ps -q)";
       # tmux wrappers
