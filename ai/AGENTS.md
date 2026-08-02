@@ -10,9 +10,7 @@ Guides for operating this local environment.
 
 ## Languages
 
-**Read the matching doc before writing code in that language.** These are not
-loaded automatically; open the file. They are read-only — to change one, edit
-its source under `/etc/nix-darwin/ai/` and rebuild.
+**Read the matching doc before writing code in that language.** 
 
 - [go](~/.ai/lang/go.md): Go test style and code review conventions.
 - [nix](~/.ai/lang/nix.md): nix-darwin config layout and how to apply changes.
