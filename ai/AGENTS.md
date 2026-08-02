@@ -14,6 +14,7 @@ Guides for operating this local environment.
 
 - [go](~/.ai/lang/go.md): Go test style and code review conventions.
 - [nix](~/.ai/lang/nix.md): nix-darwin config layout and how to apply changes.
+- [python](~/.ai/lang/python.md): venv, devenv, and project toolchain choice.
 - [ruby](~/.ai/lang/ruby.md): Bundler, rubocop and rspec invocation.
 - [typescript](~/.ai/lang/typescript.md): Node toolchain and package manager choice.
 
