@@ -262,6 +262,77 @@ with builtins;
   # lazy-lock.json and lazyvim.json are intentionally NOT managed here
   # (they are auto-updated by LazyVim).
   home.file = {
+    # Raycast Script Commands wrapping the `a` AeroSpace CLI (see darwin.nix).
+    # One-time manual step: Raycast Settings -> Extensions -> Script Commands
+    # -> "+" -> add ~/.raycast/scripts as a script directory. Raycast can't be
+    # pointed at this folder declaratively; it only reads folders added
+    # through its own UI.
+    ".raycast/scripts/aerospace-mv.sh" = {
+      executable = true;
+      text = ''
+        #!/bin/bash
+
+        # Required parameters:
+        # @raycast.schemaVersion 1
+        # @raycast.title Move Window to Workspace
+        # @raycast.mode compact
+
+        # Optional parameters:
+        # @raycast.icon 🪟
+        # @raycast.argument1 { "type": "text", "placeholder": "workspace" }
+
+        # Documentation:
+        # @raycast.description Move the window focused right before Raycast opened to the given AeroSpace workspace
+        # @raycast.author yoshiki
+
+        /run/current-system/sw/bin/a mv "$1" && echo "Moved to workspace $1"
+      '';
+    };
+
+    ".raycast/scripts/aerospace-app-mv.sh" = {
+      executable = true;
+      text = ''
+        #!/bin/bash
+
+        # Required parameters:
+        # @raycast.schemaVersion 1
+        # @raycast.title Move App to Workspace
+        # @raycast.mode compact
+
+        # Optional parameters:
+        # @raycast.icon 🪟
+        # @raycast.argument1 { "type": "text", "placeholder": "app name" }
+        # @raycast.argument2 { "type": "text", "placeholder": "workspace" }
+
+        # Documentation:
+        # @raycast.description Move the window matching an app name/bundle-id substring to the given AeroSpace workspace
+        # @raycast.author yoshiki
+
+        /run/current-system/sw/bin/a app mv "$1" "$2" && echo "Moved $1 to workspace $2"
+      '';
+    };
+
+    ".raycast/scripts/aerospace-app-ls.sh" = {
+      executable = true;
+      text = ''
+        #!/bin/bash
+
+        # Required parameters:
+        # @raycast.schemaVersion 1
+        # @raycast.title List AeroSpace Windows
+        # @raycast.mode fullOutput
+
+        # Optional parameters:
+        # @raycast.icon 🪟
+
+        # Documentation:
+        # @raycast.description List open windows: window-id, app-bundle-id, app-name
+        # @raycast.author yoshiki
+
+        /run/current-system/sw/bin/a app ls
+      '';
+    };
+
     # herdr — use the default ctrl+b prefix
     ".config/herdr/config.toml".source =
       (pkgs.formats.toml { }).generate "herdr-config.toml" {
@@ -314,6 +385,11 @@ with builtins;
         key-mapping.preset = "qwerty";
 
         on-focused-monitor-changed = [ "move-mouse monitor-lazy-center" ];
+
+        # Feeds `a app mv`'s multi-window disambiguation (see darwin.nix):
+        # records focus order so it can pick the most-recently-focused match
+        # when an app has several windows open.
+        on-focus-changed = [ "exec-and-forget /run/current-system/sw/bin/aerospace-track-focus" ];
 
         gaps = {
           inner = { horizontal = 5; vertical = 5; };
