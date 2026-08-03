@@ -24,6 +24,7 @@ Read when the task matches.
 
 - [clone-repo](~/.ai/usecase/clone-repo.md): cloning or locating a repo, anything under `~/.ghq`.
 - [code-review](~/.ai/usecase/code-review.md): reviewing a diff or pull request.
+- [pull-request](~/.ai/usecase/pull-request.md): writing a PR title/description, or opening one with `gh pr create`.
 
 ## Tool notes
 

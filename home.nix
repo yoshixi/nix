@@ -543,4 +543,35 @@ with builtins;
     ];
   };
 
+  # Claude Code rewrites ~/.claude/settings.json at runtime (e.g. `/model`
+  # writes its choice back into it), so it can't be a home.file symlink.
+  # Instead, seed defaults into the live file on every switch: `//=` only
+  # sets a key when it's missing/null, so anything already set — by
+  # Claude Code or by hand — is left exactly as-is.
+  home.activation.claudeSettingsDefaults = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    settings_file="$HOME/.claude/settings.json"
+    mkdir -p "$(dirname "$settings_file")"
+    [ -f "$settings_file" ] || echo '{}' > "$settings_file"
+
+    tmp="$settings_file.tmp.$$"
+    ${pkgs.jq}/bin/jq \
+      '.permissions.allow //= ["Read(~/.ai/**)"]' \
+      "$settings_file" > "$tmp" && mv "$tmp" "$settings_file"
+  '';
+
+  # Same idea for Cursor's CLI agent: it persists granted permissions back
+  # into ~/.cursor/cli-config.json at runtime, so this seeds a default
+  # rather than owning the file. No confirmed "~" support in Cursor's path
+  # syntax, so this uses the absolute home path instead.
+  home.activation.cursorCliDefaults = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    settings_file="$HOME/.cursor/cli-config.json"
+    mkdir -p "$(dirname "$settings_file")"
+    [ -f "$settings_file" ] || echo '{}' > "$settings_file"
+
+    tmp="$settings_file.tmp.$$"
+    ${pkgs.jq}/bin/jq \
+      '.permissions.allow //= ["Read(${homeDirectory}/.ai/**)"]' \
+      "$settings_file" > "$tmp" && mv "$tmp" "$settings_file"
+  '';
+
 }

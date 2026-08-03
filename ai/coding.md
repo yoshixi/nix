@@ -13,6 +13,11 @@ forced it, an alternative that was rejected and why, a bug the line prevents.
 Not worth one: restating the call below, narrating control flow, labelling
 sections of an obvious sequence, or noting that code was changed.
 
+Write comments in simple English — short sentences, common words — so a
+non-native speaker can follow them as easily as a native one. Keep a comment
+to 1-2 lines when the logic isn't complicated; save longer explanations for
+the genuinely tricky cases.
+
 ## I/O boundaries
 
 Keep business logic free of I/O — no database, HTTP, filesystem, clock or
