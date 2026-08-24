@@ -29,6 +29,9 @@ with builtins;
     google-cloud-sdk
     (callPackage ./pkgs/googleworkspace-cli.nix {})
 
+    # awslocal, for LocalStack (was Homebrew brew, moved to Nix)
+    (callPackage ./pkgs/awscli-local.nix {})
+
     # background
     tailscale
 
@@ -39,6 +42,9 @@ with builtins;
     _1password-cli
 
     process-compose
+
+    # local dev stack of moderepo/platform-localdev
+    mise tilt
 
     cloudflared
 

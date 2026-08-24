@@ -229,7 +229,6 @@ in
     enable = true;
     brews = [
       "reattach-to-user-namespace"
-      "awscli-local"
       "googleworkspace-cli"
     ];
     casks = [
