@@ -6,7 +6,7 @@ _worktree_usage() {
   echo "  create <branch>  Create worktree and herdr workspace for branch"
   echo "  ls               List all worktrees"
   echo "  cd               Fuzzy-pick a worktree and cd into it"
-  echo "  delete           Fuzzy-pick a worktree and remove it"
+  echo "  delete           Fuzzy-pick one or more worktrees (space to multi-select) and remove them"
 }
 
 _worktree_create() {
@@ -76,13 +76,23 @@ _worktree_cd() {
 
 _worktree_delete() {
   local root="$(git rev-parse --show-toplevel)"
-  local selected
-  selected=$(_worktree_list | awk -F'\t' -v root="$root" '$1 != root' | \
-    fzf --prompt="delete worktree > " --height=40% --reverse \
-      --delimiter='\t' --with-nth=2 | cut -f1)
-  [[ -z "$selected" ]] && return 0
-  git worktree remove "$selected" || git worktree remove --force "$selected"
-  echo "Removed worktree: $selected"
+  local -a selected
+  selected=("${(@f)$(_worktree_list | awk -F'\t' -v root="$root" '$1 != root' | \
+    fzf --prompt="delete worktree(s) > " --height=40% --reverse --multi \
+      --bind 'space:toggle+down' \
+      --delimiter='\t' --with-nth=2 | cut -f1)}")
+  [[ -z "${selected[1]:-}" ]] && return 0
+
+  # NOTE: don't name this loop var "path" - it's a special zsh parameter
+  # tied to $PATH, and reassigning it breaks command lookup mid-loop.
+  local wt_path
+  for wt_path in "${selected[@]}"; do
+    if git worktree remove "$wt_path" || git worktree remove --force "$wt_path"; then
+      echo "Removed worktree: $wt_path"
+    else
+      echo "Failed to remove worktree: $wt_path" >&2
+    fi
+  done
 }
 
 _worktree_ls() {
