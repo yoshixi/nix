@@ -186,6 +186,10 @@ with builtins;
       . ${./zsh/secureinput.zsh}
       # Allows running adb from anywhere; requires Android Studio to be installed
       export PATH="$PATH:$HOME/Library/Android/sdk/platform-tools"
+
+      # Homebrew (aws-vault, gh, jq, tfenv, etc.) - appended so nix-managed
+      # packages win over anything that overlaps with a brew formula.
+      export PATH="$PATH:/opt/homebrew/bin:/opt/homebrew/sbin"
     '';
 
     loginExtra = ''
