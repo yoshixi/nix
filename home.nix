@@ -18,9 +18,10 @@ with builtins;
     go nodejs_24
     python3
     docker
+    colima
 
     # shells
-    tmux fzf git ghq gh lazygit lazydocker
+    tmux fzf git ghq gh lazygit lazydocker shfmt
 
     # log viewer (https://lnav.org)
     lnav
@@ -229,7 +230,9 @@ with builtins;
       vv   = "nvim ${config.home.homeDirectory}/.config/nvim";
       # shared AI agent context (see ai.nix) — read-only in $HOME, edit here
       va   = "nvim /etc/nix-darwin/ai/AGENTS.md";
-      # docker
+      # docker (colima provides the daemon; start with `dup`, stop with `ddown`)
+      dup = "colima start";
+      ddown = "colima stop";
       dkilla = "docker kill $(docker ps -q)";
       # tmux wrappers
       t      = "tmux";
@@ -410,6 +413,7 @@ with builtins;
           { "if".app-id = "com.github.Electron"; run = "layout floating"; }
           { "if".app-id = "com.electron.aqua-voice"; run = "layout floating"; }
           { "if".app-id = "com.shuchu.app"; run = "layout floating"; }
+          { "if".app-id = "com.techoo.app"; run = "layout floating"; }
           # Workspace 2: Tiles - Ghostty terminal
           { "if".app-id = "com.mitchellh.ghostty"; run = [ "move-node-to-workspace 2" "layout tiling" ]; }
 
