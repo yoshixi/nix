@@ -1,0 +1,16 @@
+{
+  "name": "difit",
+  "version": "5.0.12",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "difit": "dist/cli/index.js"
+  },
+  "dependencies": {
+    "@parcel/watcher": "^2.5.1",
+    "commander": "^15.0.0",
+    "express": "^5.1.0",
+    "open": "^11.0.0",
+    "simple-git": "^3.28.0"
+  }
+}

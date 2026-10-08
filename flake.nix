@@ -53,6 +53,14 @@
       nix.settings.extra-substituters = [ "https://devenv.cachix.org" ];
       nix.settings.extra-trusted-public-keys = [ "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=" ];
 
+      # Weekly GC and store dedupe, so old generations don't pile up.
+      nix.gc = {
+        automatic = true;
+        interval = { Weekday = 0; Hour = 3; Minute = 0; };
+        options = "--delete-older-than 14d";
+      };
+      nix.optimise.automatic = true;
+
       # Enable alternative shell support in nix-darwin.
       # programs.fish.enable = true;
 

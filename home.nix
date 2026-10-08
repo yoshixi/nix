@@ -51,6 +51,9 @@ with builtins;
 
     # agent multiplexer (https://herdr.dev), via herdr flake overlay
     herdr
+
+    # Git diff viewer with a GitHub-like Files changed view (https://github.com/yoshiko-pg/difit)
+    (callPackage ./pkgs/difit {})
   ];
 
   programs.git = {
@@ -182,6 +185,11 @@ with builtins;
       # `go` toolchain always wins over anything in here.
       export PATH="$PATH:$HOME/go/bin"
 
+      # Share terraform providers across modules instead of one copy per
+      # .terraform/ dir (was ~25GB). Terraform needs the dir to exist.
+      export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
+      [[ -d $TF_PLUGIN_CACHE_DIR ]] || mkdir -p "$TF_PLUGIN_CACHE_DIR"
+
       . ${./pkgs/worktree.zsh}
       . ${./zsh/secureinput.zsh}
       # Allows running adb from anywhere; requires Android Studio to be installed
@@ -275,77 +283,6 @@ with builtins;
   # lazy-lock.json and lazyvim.json are intentionally NOT managed here
   # (they are auto-updated by LazyVim).
   home.file = {
-    # Raycast Script Commands wrapping the `a` AeroSpace CLI (see darwin.nix).
-    # One-time manual step: Raycast Settings -> Extensions -> Script Commands
-    # -> "+" -> add ~/.raycast/scripts as a script directory. Raycast can't be
-    # pointed at this folder declaratively; it only reads folders added
-    # through its own UI.
-    ".raycast/scripts/aerospace-mv.sh" = {
-      executable = true;
-      text = ''
-        #!/bin/bash
-
-        # Required parameters:
-        # @raycast.schemaVersion 1
-        # @raycast.title Move Window to Workspace
-        # @raycast.mode compact
-
-        # Optional parameters:
-        # @raycast.icon 🪟
-        # @raycast.argument1 { "type": "text", "placeholder": "workspace" }
-
-        # Documentation:
-        # @raycast.description Move the window focused right before Raycast opened to the given AeroSpace workspace
-        # @raycast.author yoshiki
-
-        /run/current-system/sw/bin/a mv "$1" && echo "Moved to workspace $1"
-      '';
-    };
-
-    ".raycast/scripts/aerospace-app-mv.sh" = {
-      executable = true;
-      text = ''
-        #!/bin/bash
-
-        # Required parameters:
-        # @raycast.schemaVersion 1
-        # @raycast.title Move App to Workspace
-        # @raycast.mode compact
-
-        # Optional parameters:
-        # @raycast.icon 🪟
-        # @raycast.argument1 { "type": "text", "placeholder": "app name" }
-        # @raycast.argument2 { "type": "text", "placeholder": "workspace" }
-
-        # Documentation:
-        # @raycast.description Move the window matching an app name/bundle-id substring to the given AeroSpace workspace
-        # @raycast.author yoshiki
-
-        /run/current-system/sw/bin/a app mv "$1" "$2" && echo "Moved $1 to workspace $2"
-      '';
-    };
-
-    ".raycast/scripts/aerospace-app-ls.sh" = {
-      executable = true;
-      text = ''
-        #!/bin/bash
-
-        # Required parameters:
-        # @raycast.schemaVersion 1
-        # @raycast.title List AeroSpace Windows
-        # @raycast.mode fullOutput
-
-        # Optional parameters:
-        # @raycast.icon 🪟
-
-        # Documentation:
-        # @raycast.description List open windows: window-id, app-bundle-id, app-name
-        # @raycast.author yoshiki
-
-        /run/current-system/sw/bin/a app ls
-      '';
-    };
-
     # herdr — use the default ctrl+b prefix
     ".config/herdr/config.toml".source =
       (pkgs.formats.toml { }).generate "herdr-config.toml" {
@@ -376,6 +313,20 @@ with builtins;
         # Restore recent pane scrollback across a full server restart / logout.
         # Off by default because saved output can contain secrets/tokens.
         experimental.pane_history = true;
+        # Widen the workspace sidebar so long worktree-derived names (e.g.
+        # "platform-fix-orion-workflow") stop truncating into look-alikes.
+        ui.sidebar_width = 42;
+        ui.sidebar_min_width = 32;
+        ui.sidebar_max_width = 56;
+        # Worktree-created rows: branch on top (short and distinct), the
+        # workspace label ("[author/]repo/branch" — see worktree.zsh) below
+        # it — the reverse of herdr's default ["workspace"] /
+        # ["branch","git_status"] ordering.
+        ui.sidebar.spaces.row_gap = 0;
+        ui.sidebar.spaces.rows = [
+          [ "branch" ]
+          [ "workspace" ]
+        ];
       };
 
     # AeroSpace tiling WM config. Installed as a Homebrew cask (see darwin.nix)

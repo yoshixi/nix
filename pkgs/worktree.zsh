@@ -19,20 +19,38 @@ _worktree_create() {
   local dir_name="${branch//\//-}"
   local worktree_path="$_worktree_dir/$dir_name"
 
-  git worktree add "$worktree_path" "$branch" 2>/dev/null || \
+  local is_new_branch=false
+  if ! git worktree add "$worktree_path" "$branch" 2>/dev/null; then
     git worktree add -b "$branch" "$worktree_path"
+    is_new_branch=true
+  fi
 
   echo "Worktree created at $worktree_path"
 
+  local root="$(git rev-parse --show-toplevel)"
   local abs_path="$(pwd)/$worktree_path"
-  local repo_name="$(basename "$(git rev-parse --show-toplevel)")"
-  local ws_label="${repo_name}-${dir_name}"
+  local repo_name="$(basename "$root")"
+
+  # Prefix the label with the branch's author, but only for an existing
+  # branch (i.e. reviewing someone else's PR) — a brand new branch has no
+  # commits of its own yet, so its "author" would just be whoever last
+  # committed to the base ref, not you.
+  local author_prefix=""
+  if [[ "$is_new_branch" == false ]]; then
+    local branch_author my_name
+    branch_author="$(git -C "$worktree_path" log -1 --format='%an' 2>/dev/null)"
+    my_name="$(git config user.name 2>/dev/null)"
+    [[ -n "$branch_author" && "$branch_author" != "$my_name" ]] && author_prefix="${branch_author}/"
+  fi
+  local ws_label="${author_prefix}${repo_name}/${dir_name}"
 
   # Create (or focus, if it already exists) a herdr workspace for this worktree.
+  # Matched by checkout path, not label: every worktree of this repo now
+  # shares the same label, so label can no longer identify one branch.
   local ws_id
-  ws_id=$(herdr workspace list 2>/dev/null | \
-    jq -r --arg l "$ws_label" \
-      'first(.result.workspaces[] | select(.label == $l) | .workspace_id) // empty')
+  ws_id=$(herdr worktree list --cwd "$root" --json 2>/dev/null | \
+    jq -r --arg p "$abs_path" \
+      'first(.result.worktrees[] | select(.path == $p) | .open_workspace_id) // empty')
 
   if [[ -n "$ws_id" ]]; then
     echo "Focusing existing herdr workspace '$ws_label' ($ws_id)"
@@ -83,16 +101,39 @@ _worktree_delete() {
       --delimiter='\t' --with-nth=2 | cut -f1)}")
   [[ -z "${selected[1]:-}" ]] && return 0
 
+  # Map path -> herdr workspace id before removing anything: once a worktree
+  # is gone, herdr can no longer tell us which workspace was pointed at it.
+  local herdr_worktrees
+  herdr_worktrees=$(herdr worktree list --cwd "$root" --json 2>/dev/null)
+
+  # Closing a workspace shifts herdr's focus elsewhere even when it wasn't
+  # the focused one, so remember where we started and jump back at the end.
+  local origin_ws_id
+  origin_ws_id=$(herdr workspace list 2>/dev/null | \
+    jq -r 'first(.result.workspaces[] | select(.focused) | .workspace_id) // empty')
+
   # NOTE: don't name this loop var "path" - it's a special zsh parameter
   # tied to $PATH, and reassigning it breaks command lookup mid-loop.
   local wt_path
   for wt_path in "${selected[@]}"; do
+    local ws_id
+    ws_id=$(jq -r --arg p "$wt_path" \
+      'first(.result.worktrees[] | select(.path == $p) | .open_workspace_id) // empty' \
+      <<<"$herdr_worktrees")
+
     if git worktree remove "$wt_path" || git worktree remove --force "$wt_path"; then
       echo "Removed worktree: $wt_path"
+      if [[ -n "$ws_id" ]]; then
+        herdr workspace close "$ws_id" >/dev/null 2>&1 \
+          && echo "Closed herdr workspace $ws_id" \
+          || echo "Failed to close herdr workspace $ws_id" >&2
+      fi
     else
       echo "Failed to remove worktree: $wt_path" >&2
     fi
   done
+
+  [[ -n "$origin_ws_id" ]] && herdr workspace focus "$origin_ws_id" >/dev/null 2>&1
 }
 
 _worktree_ls() {

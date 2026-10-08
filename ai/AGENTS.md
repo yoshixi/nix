@@ -2,6 +2,10 @@
 
 Guides for operating this local environment.
 
+## General Instruction
+
+Use plain language and the minimal amount of technical detail required to communicate your point, so non-native speakers can follow as easily as native speakers.
+
 ## Coding
 
 **Read before writing or reviewing code, in any language.**
