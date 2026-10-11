@@ -191,6 +191,7 @@ with builtins;
       [[ -d $TF_PLUGIN_CACHE_DIR ]] || mkdir -p "$TF_PLUGIN_CACHE_DIR"
 
       . ${./pkgs/worktree.zsh}
+      . ${./pkgs/pr_review.zsh}
       . ${./zsh/secureinput.zsh}
       # Allows running adb from anywhere; requires Android Studio to be installed
       export PATH="$PATH:$HOME/Library/Android/sdk/platform-tools"
