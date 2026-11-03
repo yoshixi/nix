@@ -284,6 +284,13 @@ with builtins;
   # lazy-lock.json and lazyvim.json are intentionally NOT managed here
   # (they are auto-updated by LazyVim).
   home.file = {
+    # Bound to prefix+shift+c below: forks the claude session running in the
+    # current tab into a new tab via `claude --resume --fork-session`.
+    ".local/bin/herdr-fork-tab" = {
+      source = ./pkgs/herdr-fork-tab.sh;
+      executable = true;
+    };
+
     # herdr — use the default ctrl+b prefix
     ".config/herdr/config.toml".source =
       (pkgs.formats.toml { }).generate "herdr-config.toml" {
@@ -311,6 +318,17 @@ with builtins;
         # prefix+w, bare shift+x closes the tab and shift+q closes the workspace.
         keys.close_tab = "prefix+shift+x";
         keys.close_workspace = "prefix+shift+q";
+        # Fork the current tab's claude session into a new tab (same
+        # conversation history, new session id) via herdr-fork-tab.sh above.
+        # type = "pane": herdr runs it in a temporary pane in this tab, which
+        # closes once the script exits — the new tab it opens is what stays.
+        keys.command = [
+          {
+            key = "prefix+shift+c";
+            type = "pane";
+            command = "herdr-fork-tab";
+          }
+        ];
         # Restore recent pane scrollback across a full server restart / logout.
         # Off by default because saved output can contain secrets/tokens.
         experimental.pane_history = true;

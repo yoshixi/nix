@@ -48,16 +48,55 @@ _herdr_call() {
 # main checkout first and then its worktrees. herdr nests a worktree under
 # its repo only when they sit next to each other, so this also keeps the
 # groups intact; `worktree open` always adds a new workspace at the bottom.
-# Workspaces with no repo info sort by their own label.
+#
+# herdr only tags a workspace's `.worktree` when it was opened via
+# `herdr worktree open`/`create` — a workspace made with the older
+# `workspace create` (or anything else) has `.worktree: null` and would
+# otherwise fall back to sorting by its own label, landing it outside its
+# repo's block. So for those, resolve the repo straight from a pane's cwd
+# with git instead of trusting herdr's tag.
 _herdr_sort_workspaces() {
+  local ws_json pane_json
+  ws_json=$(herdr workspace list 2>/dev/null)
+  pane_json=$(herdr pane list 2>/dev/null)
+
+  local -a rows
+  local line id label repo_root is_linked cwd repo_key bucket
+  local -a fields
+  while IFS= read -r line; do
+    # Not `IFS=$'\t' read -r ...`: zsh's read collapses consecutive tab
+    # delimiters instead of preserving the empty field between them (unlike
+    # bash), which silently ate repo_root whenever it was empty.
+    fields=("${(@ps:\t:)line}")
+    id="${fields[1]}" label="${fields[2]}" repo_root="${fields[3]}" is_linked="${fields[4]}"
+    if [[ -z "$repo_root" ]]; then
+      cwd=$(jq -r --arg w "$id" \
+        '[.result.panes[] | select(.workspace_id == $w) | .cwd][0] // empty' <<<"$pane_json")
+      repo_root=""
+      if [[ -n "$cwd" ]]; then
+        repo_root=$(git -C "$cwd" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
+        [[ -n "$repo_root" ]] && repo_root="${repo_root%/.git}"
+      fi
+      if [[ -n "$repo_root" ]]; then
+        repo_key="$(basename "$repo_root")"
+        [[ "$cwd" == "$repo_root" ]] && bucket=0 || bucket=1
+      else
+        repo_key="$label"
+        bucket=0
+      fi
+    else
+      repo_key="$(basename "$repo_root")"
+      bucket="$is_linked"
+    fi
+    rows+=("$id"$'\t'"${(L)repo_key}"$'\t'"$bucket"$'\t'"${(L)label}")
+  done < <(jq -r '.result.workspaces[] | [
+      .workspace_id, .label,
+      (.worktree.repo_root // ""),
+      (if .worktree.is_linked_worktree then 1 else 0 end)
+    ] | @tsv' <<<"$ws_json")
+
   local -a order
-  order=("${(@f)$(herdr workspace list 2>/dev/null | jq -r '
-    .result.workspaces
-    | sort_by(
-        (if .worktree then .worktree.repo_root | split("/") | last else .label end | ascii_downcase),
-        (if .worktree.is_linked_worktree then 1 else 0 end),
-        (.label | ascii_downcase))
-    | .[].workspace_id')}")
+  order=("${(@f)$(printf '%s\n' "${rows[@]}" | sort -t $'\t' -k2,2 -k3,3n -k4,4 | cut -f1)}")
   [[ -z "${order[1]:-}" ]] && return 0
 
   # Move each one into place front to back; a workspace not yet placed is
