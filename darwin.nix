@@ -192,6 +192,23 @@ let
   '';
 in
 {
+  # PATH for GUI apps and launchd jobs, including herdr-core (hc), which starts
+  # `sh -c "claude ..."` from its own environment, not from zsh.
+  launchd.user.envVariables.PATH = lib.concatStringsSep ":" [
+    "/Users/${config.system.primaryUser}/.local/bin"
+    "/Users/${config.system.primaryUser}/.npm-global/bin"
+    "/etc/profiles/per-user/${config.system.primaryUser}/bin"
+    "/run/current-system/sw/bin"
+    "/nix/var/nix/profiles/default/bin"
+    "/opt/homebrew/bin"
+    "/opt/homebrew/sbin"
+    "/usr/local/bin"
+    "/usr/bin"
+    "/bin"
+    "/usr/sbin"
+    "/sbin"
+  ];
+
   # ===================
   # AeroSpace - Tiling Window Manager
   # ===================

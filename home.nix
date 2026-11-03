@@ -99,8 +99,22 @@ with builtins;
       core = {
         editor = "vim";
       };
+      url."ssh://git@github.com/moderepo/".insteadOf = "https://github.com/moderepo/";
+      # ghq roots differ per host. The MacBook keeps moderepo clones in ~/mode/src.
+      ghq = if username == "yoshiki" then {
+        root = "~/ghq";
+      } else {
+        root = "~/.ghq";
+        "ssh://git@github.com/moderepo/".root = "~/mode/src";
+      };
     };
   };
+
+  # Also reaches non-interactive shells (e.g. `sh -c "claude"` run by hc).
+  home.sessionPath = [
+    "$HOME/.npm-global/bin"
+    "$HOME/.local/bin"
+  ];
 
   programs.delta = {
     enable = true;
