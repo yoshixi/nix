@@ -33,7 +33,7 @@ features. You may read files to brief workers and to check their results.
 
 - Default worker: Claude Code with Sonnet. Use the `hc` templates in
   `~/.config/herdr-core/templates/` (`hc templates`): `reviewer`, `planner`,
-  `implementer`.
+  `implementer`, `designer` (slide decks).
 - Start workers with `hc run --bg`, a `--name`, `--cwd` set to the task's
   worktree and `--label herdr.space=<space id>` so the user can see them in
   the task's space.

@@ -19,6 +19,9 @@ in
     # workers also run claude and must not start agents of their own.
     ".ai/orch/.claude/skills".source = ./ai/orch/skills;
     ".local/bin/orch".source = ./ai/orch/bin/orch;
+    # Skills for any executor (plain `claude` or a worker). Linked one by one:
+    # ~/.claude/skills also holds skills installed outside nix.
+    ".claude/skills/presentation-design".source = ./ai/skills/presentation-design;
     # Worker roles for `hc run <template>`.
     ".config/herdr-core/templates".source = ./ai/orch/templates;
 

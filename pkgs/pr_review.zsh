@@ -1,8 +1,12 @@
 # Depends on worktree.zsh (_worktree_create).
 
 # Where local clones of <owner>/<repo> may live, checked in order before
-# falling back to `ghq get`.
-_pr_review_roots=("$HOME/mode/src" "$HOME/mode/src/github.com" "$HOME/.ghq/github.com")
+# falling back to `ghq get`. Extra folders come from the untracked
+# ~/.config/repo-roots (one per line), so local paths stay out of this repo.
+_pr_review_roots() {
+  [[ -f ~/.config/repo-roots ]] && sed -e 's/#.*//' -e "s|^~|$HOME|" -e '/^[[:space:]]*$/d' ~/.config/repo-roots
+  echo "$(ghq root)/github.com"
+}
 
 _pr_review_prompt() {
   local url="$1" base="$2"
@@ -13,7 +17,7 @@ _pr_review_prompt() {
 
 _pr_review_repo_dir() {
   local repo="$1" root
-  for root in "${_pr_review_roots[@]}"; do
+  for root in "${(@f)$(_pr_review_roots)}"; do
     [[ -d "$root/$repo/.git" ]] && { echo "$root/$repo"; return 0; }
   done
   ghq get "$repo" >&2 || return 1

@@ -7,7 +7,7 @@ description: Set up a workspace only - a git worktree of a repo on a branch, plu
 
 ## 1. Get the inputs
 
-- **Repo:** `owner/repo` (e.g. `moderepo/sandboxes`) or a local path.
+- **Repo:** `owner/repo` (e.g. `octocat/hello-world`) or a local path.
 - **Branch:** an existing branch, or a new one to create.
 - Optional: a base for a new branch (default `origin/HEAD`) and a space name
   (default `<repo name>/<branch>`).

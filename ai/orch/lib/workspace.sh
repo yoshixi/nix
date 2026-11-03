@@ -2,8 +2,17 @@
 # Each function prints its result on stdout; progress goes to stderr so
 # callers can capture stdout cleanly.
 
-# Checked in order before falling back to `ghq get` (same as pr_review.zsh).
-ORCH_REPO_ROOTS=("$HOME/mode/src" "$HOME/mode/src/github.com" "$HOME/.ghq/github.com")
+# Extra folders that hold <owner>/<repo> clones, one per line, checked before
+# ghq's root. A local untracked file, so machine-specific paths stay out of
+# this repo. pr_review.zsh reads the same file.
+ORCH_REPO_ROOTS_FILE="${ORCH_REPO_ROOTS_FILE:-$HOME/.config/repo-roots}"
+
+orch_repo_roots() {
+  if [[ -f "$ORCH_REPO_ROOTS_FILE" ]]; then
+    sed -e 's/#.*//' -e "s|^~|$HOME|" -e '/^[[:space:]]*$/d' "$ORCH_REPO_ROOTS_FILE"
+  fi
+  printf '%s\n' "$(ghq root)/github.com"
+}
 
 # "feat/x" -> "feat-x". Matches worktree.zsh, so both tools find the same dirs.
 orch_branch_dir() {
@@ -13,9 +22,9 @@ orch_branch_dir() {
 # orch_repo_dir <owner/repo> -> local clone path, cloning with ghq if missing.
 orch_repo_dir() {
   local repo="$1" root
-  for root in "${ORCH_REPO_ROOTS[@]}"; do
+  while IFS= read -r root; do
     [[ -d "$root/$repo/.git" ]] && { printf '%s\n' "$root/$repo"; return 0; }
-  done
+  done < <(orch_repo_roots)
   ghq get "$repo" >&2 || return 1
   printf '%s\n' "$(ghq root)/github.com/$repo"
 }

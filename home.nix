@@ -44,7 +44,7 @@ with builtins;
 
     process-compose
 
-    # local dev stack of moderepo/platform-localdev
+    # local dev stack tooling
     mise tilt
 
     cloudflared
@@ -333,7 +333,7 @@ with builtins;
         # Off by default because saved output can contain secrets/tokens.
         experimental.pane_history = true;
         # Widen the workspace sidebar so long worktree-derived names (e.g.
-        # "platform-fix-orion-workflow") stop truncating into look-alikes.
+        # "api-fix-login-timeout") stop truncating into look-alikes.
         ui.sidebar_width = 42;
         ui.sidebar_min_width = 32;
         ui.sidebar_max_width = 56;
