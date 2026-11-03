@@ -14,6 +14,14 @@ in
       recursive = true;
     };
 
+    # Orchestrator (ai/orch): `orch` starts Claude Code in ~/.ai/orch, so only
+    # that session sees these skills. Kept out of ~/.claude/skills because
+    # workers also run claude and must not start agents of their own.
+    ".ai/orch/.claude/skills".source = ./ai/orch/skills;
+    ".local/bin/orch".source = ./ai/orch/bin/orch;
+    # Worker roles for `hc run <template>`.
+    ".config/herdr-core/templates".source = ./ai/orch/templates;
+
     # No `@path` imports: they load eagerly at launch, defeating the index.
     ".claude/CLAUDE.md".source = agents;
 

@@ -6,6 +6,12 @@ Guides for operating this local environment.
 
 Use plain language and the minimal amount of technical detail required to communicate your point, so non-native speakers can follow as easily as native speakers.
 
+## Role
+
+You are a task executor by default. If you were started by `orch` (your
+working directory is `~/.ai/orch`), you are the orchestrator instead: follow
+`~/.ai/orch/AGENTS.md`, and leave the playbooks below to your workers.
+
 ## Coding
 
 **Read before writing or reviewing code, in any language.**

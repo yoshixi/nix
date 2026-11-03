@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Usage: orch [message...]
+# Opens the orchestrator (Claude Code in ~/.ai/orch, so it loads the
+# orchestrator AGENTS.md and skills) in its own herdr space, or shows the
+# space if it is already open. A message is passed on as the next request.
+set -euo pipefail
+
+dir="$HOME/.ai/orch"
+name="orchestrator"
+model="${ORCH_MODEL:-opus}"
+msg="$*"
+
+if ! layout=$(herdr-app ls 2>/dev/null); then
+  # No herdr window: run here. Workers still need hc, so warn if outside it.
+  [[ -n "${HC_TERMINAL_ID:-}" ]] || echo "orch: not inside herdr-core; workers will not be attached to you" >&2
+  cd "$dir"
+  exec claude --model "$model" ${msg:+"$msg"}
+fi
+
+space=$(jq -r --arg n "$name" 'first(.spaces[] | select(.name == $n)) // empty | @json' <<<"$layout")
+if [[ -n "$space" ]]; then
+  # The orchestrator lives in the tab named "orch"; other tabs are the user's.
+  term=$(jq -r 'first(.tabs[] | select(.name == "orch") | .terminals[0]) // .tabs[0].terminals[0] | .terminal' <<<"$space")
+  # Ask hc what is in the foreground: herdr-app's `app` stays "claude-code"
+  # after Claude exits back to its shell.
+  fg=$(hc get "$term" | jq -r '.foreground.argv[0] // empty')
+  if [[ "${fg##*/}" != "claude" ]]; then
+    # Claude was quit and only its shell is left; start a fresh session there.
+    hc send "$term" "claude --model $model${msg:+ $(printf '%q' "$msg")}" >/dev/null
+    echo "orch: Claude was not running in $term; started a new orchestrator session"
+  else
+    [[ -n "$msg" ]] && hc send "$term" "$msg" >/dev/null
+    echo "orch: switched to the running orchestrator ($term)${msg:+, message sent}"
+  fi
+  herdr-app do agent.focus --terminal "$term" >/dev/null
+  exit 0
+fi
+
+args=(--name "$name" --folder "$dir" --tab orch --argv "$(jq -cn --arg m "$model" '["claude", "--model", $m]')")
+[[ -n "$msg" ]] && args+=(--task "$msg")
+herdr-app do space.new "${args[@]}" >/dev/null
